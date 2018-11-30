@@ -66,16 +66,17 @@ def webhook_for_whatsapp_messages():
             print("THIS IS MO MESSAGE")
             user_number = data['from']['number']
             user_message = data['message']['content']['text']
-            tickets = get_zendesk_tickets_by_user(get_zendesk_user_by_number(str(user_number)))[
-                'tickets']
+            user_tickets = get_zendesk_tickets_by_user(get_zendesk_user_by_number(str(user_number)))
+            user_id = user_tickets['user_id']
+            tickets = user_tickets['tickets']
             if len(tickets) == 0 or not any(str(ticket) in user_message for ticket in tickets):
                 # create a new ticket
-                create_zendesk_ticket(user_number, user_message)
+                create_zendesk_ticket(user_id, user_message)
             else:
                 for ticket in tickets:
                     if str(ticket) in user_message:
                         # append a ticket
-                        append_zendesk_ticket(user_number, ticket, user_message)
+                        append_zendesk_ticket(user_id, ticket, user_message)
         return jsonify({'Status': 'Success'}), 200
     elif request.method == 'GET':
         if last_whatsapp_requests:

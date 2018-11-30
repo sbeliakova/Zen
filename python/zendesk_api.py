@@ -21,7 +21,6 @@ def get_zendesk_user_by_number(number):
     url = 'https://nexmo1443765028.zendesk.com/api/v2/search.json?'
     response = session.get(url, params=params)
     if response.status_code != 200:
-        print(response.content)
         print('Status:', response.status_code, 'Problem with the request. Exiting.')
         raise ValueError('Error! Did not get 200 OK repsonse')
     data = response.json()
@@ -72,7 +71,7 @@ def append_zendesk_ticket(user_id, ticket_id, message):
 
 
 def create_zendesk_ticket(user_id, message):
-    """Append an existing ticket
+    """Create a new Zendesk ticket
     @param user_id: internal Zendesk userId
     @param message: user's text from received WhatsApp message
     """
@@ -82,7 +81,7 @@ def create_zendesk_ticket(user_id, message):
     headers = {
         'Content-Type': 'application/json'
     }
-    payload = {"ticket": {"subject": "Help!", "comment": {"body": message, "author_id": user_id},
+    payload = {"ticket": {"subject": "Help!", "comment": {"body": message}, "requester_id": user_id,
                           "tags": ["fromwhatsapp"]}}
     url = 'https://nexmo1443765028.zendesk.com/api/v2/tickets.json'
     response = session.post(url, headers=headers, json=payload)
