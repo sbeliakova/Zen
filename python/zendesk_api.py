@@ -27,7 +27,10 @@ def get_zendesk_user_by_number(number):
     if data['count'] == 0:
         raise ValueError("Error! There is no such user!")
     elif data['count'] > 1:
-        raise ValueError("Error! More than one user with such number!")
+        # for the demo purposes, just pick the first user with the number
+        print('More than one user with such number, picking the first one!')
+        return data['results'][0]['id']
+        # raise ValueError("Error! More than one user with such number!")
     else:
         return data['results'][0]['id']
 
