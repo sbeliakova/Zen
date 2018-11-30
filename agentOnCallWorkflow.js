@@ -120,7 +120,7 @@ server.post('/', function(req, res) {
                 },
                 "failover":{
                   "expiry_time": 15,
-                  "condition_status": "delivered"
+                  "condition_status": "read"
                 }
               },
             {
