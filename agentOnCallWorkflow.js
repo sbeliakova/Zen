@@ -1,14 +1,10 @@
 const Nexmo = require('nexmo')
 const express = require('express');
+var request = require('request');
+var requestSync = require('sync-request');
+
 
 const nexmo = new Nexmo({
-    apiKey : '', 
-    apiSecret : '', 
-    applicationId : '', 
-    privateKey : ''
-})
-
-const nexmoVoice = new Nexmo({
     apiKey : '', 
     apiSecret : '', 
     applicationId : '', 
@@ -19,44 +15,47 @@ const server = express();
 const bodyParser = require('body-parser');
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
-const port = '8006'; 
+const port = '8007'; 
 const hostname = '127.0.0.1';
 const FB_SENDER_ID = '';
-const FB_RECIPIENT_ID = '';
-const FROM_NUMBER = '';
-const AGENT_NUMBER = '';
+//const FB_RECIPIENT_ID = '';
+const VIBER_SERVICE_MESSAGE_ID = '';
 
+const FB_RECIPIENT_DIC = {
+    
+};
+
+const FROM_NUMBER = '';
 
 server.post('/', function(req, res) {
     var ticketInfo = req.body;
     console.log(ticketInfo);
+    
+    var agent;
+    agent = requestSync('GET', '');
+    console.log(agent.getBody('utf8'));
 
-//     var NCCO = [
-//         {
-//           "action": "talk",
-//           "voiceName": "Amy",
-//           "text" : "Please check your Zendesk app. There is an update about your P1 ticket"
-//         //   "text" : `The ticket ${ticketInfo.ticketId} has been created. The priority is ${ticketInfo.priority}. The latest update was from  ${ticketInfo.assignee}. The latest comment: ${ticketInfo.latestComment}`
-//         }
-//     ];
 
-//     nexmoVoice.calls.create({
-//     to: [{
-//       type: 'phone',
-//       number: AGENT_NUMBER
-//     }],
-//     from: {
-//       type: 'phone',
-//       number: FROM_NUMBER
-//     },
-//     answer_url: ["https://api.myjson.com/bins/zrfve"]
-//   });
+    var agentModified = agent.getBody('utf8');
+    console.log("agentModified: " + agentModified);
+    console.log(typeof agentModified);
+
+    var getAgentInfo = agentModified.split(":");
+
+    console.log("agent: " + getAgentInfo);
+    console.log("agent.phone: " + getAgentInfo[3]);
+    var phone = getAgentInfo[3].slice(1, -2); 
+    console.log("phone: " + getAgentInfo[3].slice(1, -2));
+    console.log(getAgentInfo[1]);
+    var email = getAgentInfo[1].slice(1, -8);
+    console.log(email);
+
 
     if (`${ticketInfo.status}` == "NEW") {
         nexmo.dispatch.create("failover", [
             {
               "from": { "type": "messenger", "id": FB_SENDER_ID },
-              "to": { "type": "messenger", "id": FB_RECIPIENT_ID },
+              "to": { "type": "messenger", "id": FB_RECIPIENT_DIC[email] },
               "message": {
                 "content": {
                   "type": "text",
@@ -68,23 +67,23 @@ server.post('/', function(req, res) {
                 "condition_status": "read"
               }
             },
-            // {
-            //     "from": { "type": "viber_service_msg", "id": "VIBER_SERVICE_MESSAGE_ID"},
-            //     "to": { "type": "viber_service_msg", "number": `${ticketInfo.requesterNumber}`},
-            //     "message": {
-            //       "content": {
-            //         "type": "text",
-            //         "text": "This is a Viber Service Message sent from the Dispatch API"
-            //       }
-            //     },
-            //     "failover":{
-            //       "expiry_time": 600,
-            //       "condition_status": "delivered"
-            //     }
-            //   },
+            {
+                "from": { "type": "viber_service_msg", "id": VIBER_SERVICE_MESSAGE_ID},
+                "to": { "type": "viber_service_msg", "number": phone},
+                "message": {
+                  "content": {
+                    "type": "text",
+                    "text" : `The ticket ${ticketInfo.ticketId} has been updated. The latest update was from  ${ticketInfo.assignee}. The latest comment: ${ticketInfo.latestComment}`
+                }
+                },
+                "failover":{
+                  "expiry_time": 15,
+                  "condition_status": "read"
+                }
+              },
             {
               "from": {"type": "sms", "number": FROM_NUMBER},
-              "to": { "type": "sms", "number": AGENT_NUMBER},
+              "to": { "type": "sms", "number": phone},
               "message": {
                 "content": {
                   "type": "text",
@@ -98,7 +97,7 @@ server.post('/', function(req, res) {
         nexmo.dispatch.create("failover", [
             {
               "from": { "type": "messenger", "id": FB_SENDER_ID },
-              "to": { "type": "messenger", "id": FB_RECIPIENT_ID },
+              "to": { "type": "messenger", "id": FB_RECIPIENT_DIC[email] },
               "message": {
                 "content": {
                   "type": "text",
@@ -111,8 +110,22 @@ server.post('/', function(req, res) {
               }
             },
             {
+                "from": { "type": "viber_service_msg", "id": VIBER_SERVICE_MESSAGE_ID},
+                "to": { "type": "viber_service_msg", "number": phone},
+                "message": {
+                  "content": {
+                    "type": "text",
+                    "text" : `The ticket ${ticketInfo.ticketId} has been updated. The latest update was from  ${ticketInfo.assignee}. The latest comment: ${ticketInfo.latestComment}`
+                }
+                },
+                "failover":{
+                  "expiry_time": 15,
+                  "condition_status": "delivered"
+                }
+              },
+            {
               "from": {"type": "sms", "number": FROM_NUMBER},
-              "to": { "type": "sms", "number": `${ticketInfo.requesterNumber}`},
+              "to": { "type": "sms", "number": phone},
               "message": {
                 "content": {
                   "type": "text",
