@@ -2,17 +2,17 @@ const Nexmo = require('nexmo')
 const express = require('express');
 
 const nexmo = new Nexmo({
-    apiKey : 'ddc4d660', 
-    apiSecret : 'dab9d899815c0a9E', 
-    applicationId : '70926cf6-247f-40b3-80b7-5d038e56f45d', 
-    privateKey : '/Users/sbeliakova/Desktop/HACKATON/private.key'
+    apiKey : '', 
+    apiSecret : '', 
+    applicationId : '', 
+    privateKey : ''
 })
 
 const nexmoVoice = new Nexmo({
-    apiKey : 'ddc4d660', 
-    apiSecret : 'dab9d899815c0a9E', 
-    applicationId : '04cfb846-079c-4735-abd0-01d53a18e1b4', 
-    privateKey : '/Users/sbeliakova/Desktop/HACKATON/privateVoice.key'
+    apiKey : '', 
+    apiSecret : '', 
+    applicationId : '', 
+    privateKey : ''
 })
 
 const server = express();
@@ -21,10 +21,10 @@ server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 const port = '8006'; 
 const hostname = '127.0.0.1';
-const FB_SENDER_ID = '1593187647464057';
-const FB_RECIPIENT_ID = '1631476560261453';
-const FROM_NUMBER = '447520631575';
-const AGENT_NUMBER = '447933037519';
+const FB_SENDER_ID = '';
+const FB_RECIPIENT_ID = '';
+const FROM_NUMBER = '';
+const AGENT_NUMBER = '';
 
 
 server.post('/', function(req, res) {
